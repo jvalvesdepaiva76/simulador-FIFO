@@ -1,0 +1,14 @@
+[
+    {
+        "tempo_chegada": 0,
+        "tempo_execucao": 5
+    },
+    {
+        "tempo_chegada": 2,
+        "tempo_execucao": 3
+    },
+    {
+        "tempo_chegada": 4,
+        "tempo_execucao": 2
+    }
+]
