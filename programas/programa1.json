@@ -1,14 +1,17 @@
 [
     {
         "tempo_chegada": 0,
-        "tempo_execucao": 5
+        "tempo_execucao": 2,
+        "memoria": 1
     },
     {
         "tempo_chegada": 2,
-        "tempo_execucao": 3
+        "tempo_execucao": 3,
+        "memoria": 1
     },
     {
         "tempo_chegada": 4,
-        "tempo_execucao": 2
+        "tempo_execucao": 1,
+        "memoria": 1
     }
 ]

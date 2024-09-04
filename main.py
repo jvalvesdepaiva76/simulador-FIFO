@@ -37,7 +37,8 @@ def main():
             try:
                 tempo_chegada = int(input("Informe o tempo de chegada do processo: "))
                 tempo_execucao = int(input("Informe o tempo de execução do processo: "))
-                simulador.adicionar_processo(tempo_chegada, tempo_execucao)
+                memoria = int(input("Informe a memória utilizada pelo processo: "))
+                simulador.adicionar_processo(tempo_chegada, tempo_execucao, memoria)
                 
                 continuar = input("Deseja adicionar outro processo? (s/n): ")
                 if continuar.lower() != 's':
@@ -59,7 +60,7 @@ def main():
                     processos = carregar_processos_de_arquivo(caminho_arquivo)
                     if processos:
                         for processo in processos:
-                            simulador.adicionar_processo(processo['tempo_chegada'], processo['tempo_execucao'])
+                            simulador.adicionar_processo(processo['tempo_chegada'], processo['tempo_execucao'], processo['memoria'])
                 else:
                     print("Escolha inválida. Encerrando o programa.")
                     return
