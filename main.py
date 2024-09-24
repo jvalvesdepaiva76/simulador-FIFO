@@ -64,6 +64,30 @@ class SimuladorApp:
         self.memoria_visual = []
         self.desenhar_memoria()
 
+        '''
+        self.btn_clear_all = tk.Button(root, text="Limpar Tudo", command=self.clear_all)
+        self.btn_clear_all.grid(row=7, column=0, columnspan=2, pady=5)
+
+        # Novo método clear_all
+        def clear_all(self):
+            # Limpar campos de entrada
+            self.entry_chegada.delete(0, tk.END)
+            self.entry_execucao.delete(0, tk.END)
+            self.entry_memoria.delete(0, tk.END)
+            self.io_var.set(0)  # Desmarcar o checkbox de I/O
+
+            # Limpar a lista de processos
+            self.processos_listbox.delete(0, tk.END)
+
+            # Limpar o canvas
+            self.canvas.delete("all")
+            self.desenhar_memoria()
+
+            # Limpar o campo de métricas
+            self.text_metricas.delete(1.0, tk.END)
+            self.resetCount()
+        '''
+
     def desenhar_memoria(self):
         """Desenha um paralelepípedo dividido em 16 partições representando a memória."""
         self.memoria_visual = []
