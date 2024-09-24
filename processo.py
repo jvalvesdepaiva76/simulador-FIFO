@@ -1,3 +1,4 @@
+import random
 class Processo:
     def __init__(self, id_processo, tempo_chegada, tempo_execucao, memoria, io_necessario=False):
         self.id_processo = id_processo

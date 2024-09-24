@@ -1,18 +1,19 @@
 [
     {
         "tempo_chegada": 1,
-        "tempo_execucao": 2,
-        "memoria": 1
+        "tempo_execucao": 4,
+        "memoria": 3,
+        "io_necessario": true
     },
     {
         "tempo_chegada": 2,
-        "tempo_execucao": 3,
+        "tempo_execucao": 5,
         "memoria": 6,
         "io_necessario": true
     },
     {
-        "tempo_chegada": 6,
-        "tempo_execucao": 1,
+        "tempo_chegada": 3,
+        "tempo_execucao": 2,
         "memoria": 1
     }
 ]
