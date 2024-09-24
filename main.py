@@ -46,7 +46,7 @@ class SimuladorApp:
         self.btn_executar_simulacao.grid(row=6, column=0, columnspan=2, pady=5)
 
         # Lista de Processos
-        self.processos_listbox = tk.Listbox(root, height=10, width=50)
+        self.processos_listbox = tk.Listbox(root, height=10, width=70)
         self.processos_listbox.grid(row=7, column=0, columnspan=2, pady=5)
 
         # Canvas para representação gráfica da simulação
@@ -59,6 +59,35 @@ class SimuladorApp:
 
         # Armazenar referência visual de processos
         self.processos_visuais = {}
+
+        # Memória visual (16 partições)
+        self.memoria_visual = []
+        self.desenhar_memoria()
+
+    def desenhar_memoria(self):
+        """Desenha um paralelepípedo dividido em 16 partições representando a memória."""
+        self.memoria_visual = []
+        x0, y0, largura, altura = 10, 250, 35, 20  # Definir o tamanho de cada partição de memória
+        for i in range(16):
+            x1 = x0 + largura
+            y1 = y0 + altura
+            particao = self.canvas.create_rectangle(x0, y0, x1, y1, fill="white", outline="black")
+            self.memoria_visual.append(particao)
+            x0 = x1 + 2  # Adicionar espaço entre as partições
+
+    def atualizar_memoria_visual(self, memoria_necessaria, cor):
+        """Atualiza as partições da memória com a cor correspondente ao processo executando."""
+        for i in range(memoria_necessaria):
+            if i < len(self.memoria_visual):  # Para evitar exceções
+                self.canvas.itemconfig(self.memoria_visual[i], fill=cor)
+
+        # Força a atualização imediata da interface gráfica
+        self.root.update_idletasks()
+
+    def liberar_memoria_visual(self):
+        """Libera todas as partições de memória, retornando à cor branca."""
+        for particao in self.memoria_visual:
+            self.canvas.itemconfig(particao, fill="white")
 
     def adicionar_processo(self):
         try:
@@ -129,7 +158,7 @@ class SimuladorApp:
         thread_simulacao = threading.Thread(target=self.executar_simulacao)
         thread_simulacao.start()
 
-    def executar_simulacao(self): # Limpar a canvas antes de redesenhar
+    def executar_simulacao(self):
         self.text_metricas.delete(1.0, tk.END)  # Limpar o campo de texto das métricas
         processos = self.simulador.get_processos_em_fila()
         self.processar_proximos_processos(processos, 0)
@@ -138,6 +167,7 @@ class SimuladorApp:
         if index < len(processos):
             processo = processos[index]
             self.atualizar_processo_visual(processo.id_processo, "Executando")
+            self.atualizar_memoria_visual(processo.memoria, "gray")  # Atualizar a memória conforme o processo executa
 
             tempo_execucao_ms = processo.tempo_execucao * 1000
             self.root.after(tempo_execucao_ms, lambda: self.finalizar_processo(processo, processos, index))
@@ -146,6 +176,7 @@ class SimuladorApp:
 
     def finalizar_processo(self, processo, processos, index):
         self.atualizar_processo_visual(processo.id_processo, "Concluído")
+        self.liberar_memoria_visual()  # Libera a memória após o processo terminar
         self.processar_proximos_processos(processos, index + 1)
 
     def exibir_metricas(self):
