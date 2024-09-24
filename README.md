@@ -123,6 +123,12 @@ Throughput: 0.43 processos por unidade de tempo.
    python main.py
    ```
 
+4. **Baixando tkinter**:
+   No terminal execute o comando: apt-get install python3-tk
+      ```bash
+   apt-get install python3-tk
+   ```
+
 ---
 
 ## 🤝 **Contribuições**
