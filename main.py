@@ -5,20 +5,6 @@ import json
 import threading
 
 
-import tkinter as tk
-from tkinter import filedialog, messagebox
-from simulador import SimuladorFIFO
-import json
-import threading
-
-
-import tkinter as tk
-from tkinter import filedialog, messagebox
-from simulador import SimuladorFIFO
-import json
-import threading
-
-
 class SimuladorApp:
     def __init__(self, root):
         self.root = root
@@ -60,14 +46,19 @@ class SimuladorApp:
         self.btn_executar_simulacao.grid(row=6, column=0, columnspan=2, pady=5)
 
         # Lista de Processos
-        self.processos_listbox = tk.Listbox(root, height=10, width=70)
+        self.processos_listbox = tk.Listbox(root, height=10, width=50)
         self.processos_listbox.grid(row=7, column=0, columnspan=2, pady=5)
 
-        # Status da Simulação
-        self.lbl_status = tk.Label(root, text="Status da Simulação:")
-        self.lbl_status.grid(row=8, column=0, columnspan=2)
-        self.text_status = tk.Text(root, height=20, width=50)
-        self.text_status.grid(row=9, column=0, columnspan=2)
+        # Canvas para representação gráfica da simulação
+        self.canvas = tk.Canvas(root, width=600, height=300, bg="white")
+        self.canvas.grid(row=8, column=0, columnspan=2, pady=5)
+
+        # Campo de texto para exibir as métricas de desempenho
+        self.text_metricas = tk.Text(root, height=10, width=70)
+        self.text_metricas.grid(row=9, column=0, columnspan=2, pady=5)
+
+        # Armazenar referência visual de processos
+        self.processos_visuais = {}
 
     def adicionar_processo(self):
         try:
@@ -82,6 +73,9 @@ class SimuladorApp:
             # Adicionar o processo à lista na interface
             self.processos_listbox.insert(tk.END, f"Processo - Chegada: {tempo_chegada}, Execução: {tempo_execucao}, Memória: {memoria}, I/O: {'Sim' if io_necessario else 'Não'}")
 
+            # Desenhar processo na interface gráfica
+            self.desenhar_processo_visual(self.simulador.proximo_id - 1, tempo_execucao, memoria)
+
             # Limpar campos de entrada
             self.entry_chegada.delete(0, tk.END)
             self.entry_execucao.delete(0, tk.END)
@@ -89,6 +83,33 @@ class SimuladorApp:
             self.io_var.set(0)  # Desmarcar o checkbox de I/O
         except ValueError:
             messagebox.showerror("Erro", "Por favor, insira valores válidos.")
+
+    def desenhar_processo_visual(self, id_processo, tempo_execucao, memoria):
+        """Desenha um processo como uma barra colorida na canvas."""
+        x0, y0 = 10, 20 + (id_processo * 30)  # Posicionamento inicial baseado no ID
+        x1 = 10 + (tempo_execucao * 20)  # Largura do retângulo proporcional ao tempo de execução
+        y1 = y0 + 20
+
+        cor = "green"  # Cor inicial para processos prontos
+        processo_visual = self.canvas.create_rectangle(x0, y0, x1, y1, fill=cor)
+        texto_visual = self.canvas.create_text((x0 + x1) / 2, (y0 + y1) / 2, text=f"ID {id_processo}")
+        self.processos_visuais[id_processo] = (processo_visual, texto_visual)
+
+    def atualizar_processo_visual(self, id_processo, status):
+        """Atualiza a cor do processo na visualização com base no status."""
+        processo_visual, _ = self.processos_visuais[id_processo]
+
+        cor_status = {
+            "Pronto": "green",
+            "Executando": "blue",
+            "Bloqueado": "orange",
+            "Concluído": "gray"
+        }
+        nova_cor = cor_status.get(status, "green")
+        self.canvas.itemconfig(processo_visual, fill=nova_cor)
+
+        # Força a atualização imediata da interface gráfica
+        self.root.update_idletasks()
 
     def carregar_arquivo(self):
         caminho_arquivo = filedialog.askopenfilename(filetypes=[("JSON files", "*.json")])
@@ -99,6 +120,7 @@ class SimuladorApp:
                     for processo in processos:
                         self.simulador.adicionar_processo(processo['tempo_chegada'], processo['tempo_execucao'], processo['memoria'], processo.get('io_necessario', False))
                         self.processos_listbox.insert(tk.END, f"Processo - Chegada: {processo['tempo_chegada']}, Execução: {processo['tempo_execucao']}, Memória: {processo['memoria']}, I/O: {'Sim' if processo.get('io_necessario', False) else 'Não'}")
+                        self.desenhar_processo_visual(self.simulador.proximo_id - 1, processo['tempo_execucao'], processo['memoria'])
             except (FileNotFoundError, json.JSONDecodeError):
                 messagebox.showerror("Erro", "Erro ao carregar o arquivo JSON.")
 
@@ -107,34 +129,27 @@ class SimuladorApp:
         thread_simulacao = threading.Thread(target=self.executar_simulacao)
         thread_simulacao.start()
 
-    def executar_simulacao(self):
-        self.text_status.delete(1.0, tk.END)
+    def executar_simulacao(self): # Limpar a canvas antes de redesenhar
+        self.text_metricas.delete(1.0, tk.END)  # Limpar o campo de texto das métricas
         processos = self.simulador.get_processos_em_fila()
         self.processar_proximos_processos(processos, 0)
 
     def processar_proximos_processos(self, processos, index):
         if index < len(processos):
             processo = processos[index]
-            status = f"Processando: Processo {processo.id_processo}, Execução: {processo.tempo_execucao}s\n"
-            self.atualizar_status(status)
+            self.atualizar_processo_visual(processo.id_processo, "Executando")
 
             tempo_execucao_ms = processo.tempo_execucao * 1000
             self.root.after(tempo_execucao_ms, lambda: self.finalizar_processo(processo, processos, index))
         else:
-            self.atualizar_status("Simulação finalizada.\n")
             self.exibir_metricas()
 
     def finalizar_processo(self, processo, processos, index):
-        status_final = f"Finalizado: Processo {processo.id_processo}\n"
-        self.atualizar_status(status_final)
+        self.atualizar_processo_visual(processo.id_processo, "Concluído")
         self.processar_proximos_processos(processos, index + 1)
 
-    def atualizar_status(self, mensagem):
-        self.text_status.insert(tk.END, mensagem)
-        self.text_status.see(tk.END)
-
     def exibir_metricas(self):
-        """Exibe as métricas de desempenho no campo de status."""
+        """Exibe as métricas de desempenho no campo de texto."""
         metricas = self.simulador.metricas
         processos_executados = metricas["processos_executados"]
 
@@ -144,14 +159,14 @@ class SimuladorApp:
             tempo_medio_execucao = metricas["tempo_execucao_total"] / processos_executados
             throughput = processos_executados / metricas["tempo_total_simulacao"]
 
-            # Exibir as métricas no campo de status
-            self.atualizar_status("\nMétricas de Desempenho:\n")
-            self.atualizar_status(f"Tempo médio de espera: {tempo_medio_espera:.2f}\n")
-            self.atualizar_status(f"Tempo médio de resposta: {tempo_medio_resposta:.2f}\n")
-            self.atualizar_status(f"Tempo médio de execução: {tempo_medio_execucao:.2f}\n")
-            self.atualizar_status(f"Throughput: {throughput:.2f} processos por unidade de tempo.\n")
+            # Exibir as métricas no campo de texto
+            self.text_metricas.insert(tk.END, "\nMétricas de Desempenho:\n")
+            self.text_metricas.insert(tk.END, f"Tempo médio de espera: {tempo_medio_espera:.2f}\n")
+            self.text_metricas.insert(tk.END, f"Tempo médio de resposta: {tempo_medio_resposta:.2f}\n")
+            self.text_metricas.insert(tk.END, f"Tempo médio de execução: {tempo_medio_execucao:.2f}\n")
+            self.text_metricas.insert(tk.END, f"Throughput: {throughput:.2f} processos por unidade de tempo.\n")
         else:
-            self.atualizar_status("Nenhum processo foi executado.\n")
+            self.text_metricas.insert(tk.END, "Nenhum processo foi executado.\n")
 
 
 # Main loop do Tkinter
@@ -159,4 +174,3 @@ if __name__ == "__main__":
     root = tk.Tk()
     app = SimuladorApp(root)
     root.mainloop()
-

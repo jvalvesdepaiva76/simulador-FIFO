@@ -1,6 +1,6 @@
 [
     {
-        "tempo_chegada": 0,
+        "tempo_chegada": 1,
         "tempo_execucao": 2,
         "memoria": 1
     },
@@ -10,7 +10,7 @@
         "memoria": 1
     },
     {
-        "tempo_chegada": 4,
+        "tempo_chegada": 6,
         "tempo_execucao": 1,
         "memoria": 1
     }
