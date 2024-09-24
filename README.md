@@ -1,16 +1,18 @@
+---
+
 # 🖥️ Simulador de Escalonamento FIFO em Python
 
 ## 🎯 **Objetivo**
 
-Este projeto tem como objetivo analisar e implementar um algoritmo de escalonamento de processos **FIFO (First In, First Out)**.
+Este projeto tem como objetivo analisar e implementar o algoritmo de escalonamento de processos **FIFO (First In, First Out)**, simulando o comportamento de processos em um ambiente de sistemas operacionais.
 
 ## 💡 **Justificativa**
 
-O escalonamento de processos é crucial para a eficiência dos sistemas operacionais, impactando diretamente a performance e a experiência do usuário. Este projeto oferece uma oportunidade para entender melhor o funcionamento de um algoritmo de escalonamento FIFO.
+O escalonamento de processos é crucial para a eficiência dos sistemas operacionais, impactando diretamente a performance e a experiência do usuário. Este projeto oferece uma oportunidade de entender o funcionamento do algoritmo FIFO no contexto de gerenciamento de processos.
 
 ## 📚 **Estudo Teórico**
 
-Antes de iniciar a implementação, foram estudados os principais algoritmos de escalonamento de processos, incluindo:
+Foram estudados os principais algoritmos de escalonamento de processos, incluindo:
 
 - **FIFO (First In, First Out)**
 - **SJF (Shortest Job First)**
@@ -22,42 +24,88 @@ Antes de iniciar a implementação, foram estudados os principais algoritmos de 
 ## 🚀 **Funcionalidades Implementadas**
 
 1. **Simulação de Escalonamento FIFO**:
-   - Implementação de um simulador de escalonamento de processos baseado no algoritmo FIFO.
-   - Adição e gerenciamento de processos com os seguintes parâmetros:
+   - Implementação de um simulador baseado no algoritmo FIFO.
+   - Gerenciamento de processos com os seguintes parâmetros:
      - **⏰ Tempo de Chegada**
      - **🕒 Tempo de Execução**
      - **💾 Memória Utilizada**
      - **🔄 Status do Processo**:
-       - **Pronto**: O processo está na fila aguardando execução.
+       - **Pronto**: O processo está aguardando execução.
        - **Executando**: O processo está sendo executado.
        - **Concluído**: O processo terminou sua execução.
-     - **🚀 Tempo de Início da Execução**: Registrado no momento em que o processo começa a ser executado.
+     - **🚀 Tempo de Início da Execução**: Registrado quando o processo começa a ser executado.
      - **🏁 Tempo de Conclusão**: Registrado quando o processo finaliza sua execução.
 
 2. **Execução de Processos**:
-   - Os processos são executados na ordem de chegada (FIFO).
-   - A simulação imprime em tempo real o status de cada processo à medida que ele avança de "Pronto" para "Executando" e, finalmente, "Concluído".
+   - Processos executados na ordem de chegada (FIFO).
+   - Simulação em tempo real dos estados dos processos ("Pronto", "Executando", "Concluído").
+
+3. **Interface Gráfica**:
+   - Implementação de uma interface gráfica utilizando Tkinter.
+   - O usuário pode adicionar processos manualmente ou carregar de um arquivo JSON.
+   - Visualização gráfica dos processos em execução e da memória do sistema (representada por um paralelepípedo com 16 partições).
+     - Quando um processo é executado, as partições de memória são preenchidas de acordo com o uso de memória do processo.
+
+4. **Simulação Visual da Memória**:
+   - Um paralelepípedo com 16 partições representa a memória do sistema.
+   - Quando um processo está em execução, as partições correspondentes ao tamanho de memória são coloridas para indicar uso.
+   - Após a conclusão do processo, a memória é liberada visualmente.
+
+5. **Coleta de Métricas de Desempenho**:
+   - **Tempo Médio de Espera**: O tempo médio que os processos aguardam na fila antes da execução.
+   - **Tempo Médio de Resposta**: O tempo médio desde a chegada do processo até o início da execução.
+   - **Tempo Médio de Execução (Turnaround)**: O tempo total que o processo leva desde sua chegada até sua conclusão.
+   - **Throughput**: O número de processos finalizados por unidade de tempo da simulação.
+
+## 📈 **Exemplo de Execução**
+
+**Processos de Exemplo:**
+```json
+[
+    {
+        "tempo_chegada": 1,
+        "tempo_execucao": 2,
+        "memoria": 1
+    },
+    {
+        "tempo_chegada": 2,
+        "tempo_execucao": 3,
+        "memoria": 6
+    },
+    {
+        "tempo_chegada": 6,
+        "tempo_execucao": 1,
+        "memoria": 1
+    }
+]
+```
+
+**Métricas de Desempenho**:
+```
+Métricas de Desempenho:
+Tempo médio de espera: 0.33
+Tempo médio de resposta: 0.33
+Tempo médio de execução: 2.33
+Throughput: 0.43 processos por unidade de tempo.
+```
 
 ## 🛠️ **Funcionalidades Futuras**
 
-1. **Coleta de Métricas de Desempenho**:
-   - **Tempo de Espera Médio**: Cálculo do tempo médio que os processos esperam na fila antes de serem executados.
-   - **Tempo de Resposta Médio**: Cálculo do tempo médio desde a chegada do processo até a sua conclusão.
-   - **Throughput**: Medição do número de processos finalizados por unidade de tempo.
+1. **Simulação de I/O e Bloqueio**:
+   - Implementação de operações de I/O que suspendem temporariamente a execução dos processos.
+   - Adição de tempo de bloqueio para simular espera por recursos.
 
-2. **Interface Gráfica**:
-   - Adição de uma interface gráfica para facilitar a interação com o simulador.
-   - Implementação planejada quando o projeto for convertido em um executável.
+2. **Expansão da Interface Gráfica**:
+   - Opções para visualização mais detalhada do uso de memória e recursos.
+   - Representação gráfica das operações de I/O e bloqueios dos processos.
 
-3. **Simulação de I/O e Tempo de Bloqueio**:
-   - Simulação de processos que realizam operações de I/O, que podem suspender a execução do processo.
-   - Implementação de tempos de bloqueio, simulando a espera por recursos ou operações de entrada/saída.
+3. **Melhoria na Visualização da Memória**:
+   - Representar a memória com maior granularidade e ajustes dinâmicos.
 
-## 🔧 **Simulação**
+4. **Compilação do Projeto em Executável**:
+   - Planejamento para compilar o projeto em um executável utilizando ferramentas como PyInstaller.
 
-O simulador foi desenvolvido em Python e permite a adição manual de processos ou o carregamento de processos a partir de arquivos JSON. Durante a simulação, o usuário pode observar a mudança de estado dos processos e seu tempo de execução, facilitando o entendimento do funcionamento do algoritmo FIFO.
-
-## **Instruções para Execução (Ainda a implementar o executável)**
+## 🔧 **Instruções para Execução**
 
 1. **Clonar o repositório**:
    ```bash
@@ -65,10 +113,17 @@ O simulador foi desenvolvido em Python e permite a adição manual de processos 
    cd simulador-FIFO
    ```
 
-2. **Executar o simulador**:
+2. **Instalar as dependências**:
+   ```bash
+   pip install -r requirements.txt
+   ```
+
+3. **Executar o simulador**:
    ```bash
    python main.py
    ```
+
+---
 
 ## 🤝 **Contribuições**
 
