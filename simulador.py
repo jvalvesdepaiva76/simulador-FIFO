@@ -1,6 +1,6 @@
-import random
 from fila import Fila
 from processo import Processo
+
 
 class SimuladorFIFO:
     def __init__(self):
@@ -16,49 +16,44 @@ class SimuladorFIFO:
         }
 
     def adicionar_processo(self, tempo_chegada, tempo_execucao, memoria, io_necessario=False):
+        """Adiciona um novo processo à fila de execução"""
         processo = Processo(self.proximo_id, tempo_chegada, tempo_execucao, memoria, io_necessario)
         self.fila.enfileirar(processo)
         self.proximo_id += 1
 
     def get_processos_em_fila(self):
+        """Executa os processos sem tempo simulado e calcula as métricas"""
         processos = []
-        tempo_atual = 0
+        tempo_conclusao_anterior = 0  # Mantém o tempo de conclusão do processo anterior
 
         while len(self.fila) > 0:
             processo = self.fila.desenfileirar()
             processos.append(processo)
 
-            while processo.tempo_restante > 0:
-                if processo.io_necessario:
-                    processo.bloquear()
-                    while processo.bloqueado:
-                        processo.desbloquear()
-                        tempo_atual += 1
+            # O processo inicia quando chega a sua vez de execução
+            processo.tempo_inicio = max(tempo_conclusao_anterior, processo.tempo_chegada)
 
-                processo.executar()
-                tempo_atual += 1
+            # O processo termina depois de ser executado
+            processo.tempo_conclusao = processo.tempo_inicio + processo.tempo_execucao
+            tempo_conclusao_anterior = processo.tempo_conclusao
 
-            # Calcular métricas
-            tempo_espera = tempo_atual - processo.tempo_chegada
-            if processo.tempo_inicio is None:
-                processo.tempo_inicio = tempo_atual
-                tempo_resposta = processo.tempo_inicio - processo.tempo_chegada
-            else:
-                tempo_resposta = 0
+            # Calcular tempos para métricas
+            processo.tempo_espera = processo.tempo_inicio - processo.tempo_chegada  # Tempo de Espera
+            processo.tempo_resposta = processo.tempo_conclusao - processo.tempo_chegada  # Tempo de Resposta
 
-            self.metricas["tempo_espera_total"] += tempo_espera
-            self.metricas["tempo_resposta_total"] += tempo_resposta
+            # Atualizar métricas globais
+            self.metricas["tempo_espera_total"] += processo.tempo_espera
+            self.metricas["tempo_resposta_total"] += processo.tempo_resposta
+            self.metricas["tempo_execucao_total"] += processo.tempo_execucao
             self.metricas["processos_executados"] += 1
 
-            processo.tempo_conclusao = tempo_atual
-            self.metricas["tempo_execucao_total"] += (processo.tempo_conclusao - processo.tempo_chegada)
-
-        self.metricas["tempo_total_simulacao"] = tempo_atual
+        # Define o tempo total de simulação como o tempo do último processo concluído
+        self.metricas["tempo_total_simulacao"] = tempo_conclusao_anterior
         self.processos_executados = processos
         return processos
 
     def exibir_metricas(self):
-        """Calcula e exibe as métricas de desempenho."""
+        """Calcula e exibe as métricas ao final da simulação"""
         processos_executados = self.metricas["processos_executados"]
 
         if processos_executados > 0:
@@ -74,5 +69,3 @@ class SimuladorFIFO:
             print(f"Throughput: {throughput:.2f} processos por unidade de tempo.")
         else:
             print("Nenhum processo foi executado.")
-
-

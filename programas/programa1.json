@@ -7,8 +7,7 @@
     {
         "tempo_chegada": 2,
         "tempo_execucao": 3,
-        "memoria": 6,
-        "io_necessario": true
+        "memoria": 6
     },
     {
         "tempo_chegada": 6,
